@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  java-executor:
+    build: .
+    container_name: java-executor-service
+    ports:
+      - "3000:3000"
+    volumes:
+      # Mount Docker socket to allow container management
+      - /var/run/docker.sock:/var/run/docker.sock
+      # Persist SQLite database
+      - ./data:/app/data
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - DATABASE_PATH=/app/data/java_executor.db
+    restart: unless-stopped
+    networks:
+      - executor-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+networks:
+  executor-network:
+    driver: bridge
