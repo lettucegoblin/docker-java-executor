@@ -29,6 +29,8 @@ A Node.js server that manages Docker containers for executing Java code securely
   - [Database Reset](#database-reset)
   - [Docker Permission Issues](#docker-permission-issues)
 - [License](#license)
+- [System Design Diagrams](#system-design-diagrams)
+  - [Sequence Diagram: Job Submission](#sequence-diagram-job-submission)
 
 ## Features
 
@@ -362,6 +364,46 @@ Ensure the Node.js process has access to the Docker socket:
 sudo usermod -aG docker $USER
 # Log out and back in for changes to take effect
 ```
+
+## System Design Diagrams
+
+This section contains diagrams illustrating the system design and API workflows. These diagrams provide a visual representation of how the service operates.
+
+### Sequence Diagram: Job Submission
+
+```mermaid
+---
+config:
+  theme: base
+---
+sequenceDiagram
+    participant Client as Client(PHP)
+    participant API as API Server(Hydra)
+    participant TAR as TAR Archive
+    participant Docker as Docker Engine
+    participant Container as Java Container
+    Client->>API: POST /api/submit<br/>{javaCode, args, inputFiles[]}
+    API->>API: Validate API Key
+    API->>API: Create job ID
+    API-->>Client: Return {jobId}
+    Note over API: Package files
+    API->>TAR: Create archive:<br/>- Main.java<br/>- data.txt<br/>- config.properties
+    TAR-->>API: TAR buffer
+    API->>Docker: Create container
+    API->>Docker: Copy TAR to /app
+    Docker->>Container: Extract files
+    Container->>Container: Files available:<br/>/app/Main.java<br/>/app/data.txt<br/>/app/config.properties
+    Docker->>Container: javac Main.java
+    Docker->>Container: java Main
+    Container->>Container: Read input files<br/>Process data
+    Container-->>Docker: Output results
+    API->>Docker: Collect results
+    API->>Docker: Remove container
+    API-->>Client: Results ready for polling
+
+```
+
+More diagrams will be added in the future to further illustrate the system design and API workflows.
 
 ## License
 
