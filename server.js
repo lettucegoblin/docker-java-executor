@@ -14,7 +14,8 @@ const PROJECT_LABEL = 'java-executor-service';
 const CONTAINER_TIMEOUT_MS = 10000; // 10 seconds
 
 // Initialize SQLite database
-const db = new sqlite3.Database('java_executor.db');
+const dbPath = process.env.DATABASE_PATH || 'java_executor.db';
+const db = new sqlite3.Database(dbPath);
 
 // Initialize database tables
 async function initDatabase() {
@@ -482,7 +483,9 @@ async function start() {
     
     app.listen(PORT, () => {
       console.log(`Java Executor Service running on port ${PORT}`);
-      console.log(`Default test API key: test-api-key-123`);
+      if (process.env.NODE_ENV !== 'production') {
+        console.log(`Default test API key: test-api-key-123`);
+      }
     });
   } catch (error) {
     console.error('Failed to start server:', error);

@@ -1,8 +1,9 @@
+require('dotenv').config();
 const axios = require('axios');
 
 // Configuration
 const SERVER_URL = 'https://hydra.newpaltz.edu/java/';
-const API_KEY = 'test-api-key-123';
+const API_KEY = process.env.API_KEY || 'test-api-key-123';
 
 // Helper function to wait
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
@@ -281,7 +282,7 @@ async function example6() {
   
   try {
     const response = await axios.get(
-      `${SERVER_URL}/api/jobs?limit=5`,
+      `${SERVER_URL}/api/jobs`,
       { headers: { 'X-API-Key': API_KEY } }
     );
     

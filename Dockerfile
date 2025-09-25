@@ -14,6 +14,7 @@ RUN npm ci --only=production
 
 # Copy application files
 COPY server.js ./
+COPY manage-api-keys.js ./
 
 # Create data directory for SQLite
 RUN mkdir -p /app/data
