@@ -1,7 +1,7 @@
 const axios = require('axios');
 
 // Configuration
-const SERVER_URL = 'http://localhost:3000';
+const SERVER_URL = 'https://hydra.newpaltz.edu/java/';
 const API_KEY = 'test-api-key-123';
 
 // Helper function to wait

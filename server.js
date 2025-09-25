@@ -57,14 +57,19 @@ async function initDatabase() {
         if (err) console.error('Error creating jobs table:', err);
       });
 
-      // Insert a default API key for testing (remove in production)
-      db.run(`
-        INSERT OR IGNORE INTO api_keys (key, description) 
-        VALUES ('test-api-key-123', 'Default test API key')
-      `, (err) => {
-        if (err) console.error('Error inserting test API key:', err);
-        resolve();
-      });
+      // check for env var production
+      if (process.env.NODE_ENV !== 'production') {
+        console.log('Non-production environment detected - creating test \'test-api-key-123\' API key');
+        db.run(`
+          INSERT OR IGNORE INTO api_keys (key, description) 
+          VALUES ('test-api-key-123', 'Default test API key')
+        `, (err) => {
+          if (err) console.error('Error inserting test API key:', err);
+          resolve(); // This will now only be called in non-production
+        });
+      } else {
+        resolve(); // Ensure the promise resolves in production
+      }
     });
   });
 }

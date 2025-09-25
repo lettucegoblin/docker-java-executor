@@ -18,9 +18,14 @@ COPY server.js ./
 # Create data directory for SQLite
 RUN mkdir -p /app/data
 
-# Create non-root user
-RUN addgroup -g 1001 -S nodejs && \
-    adduser -S nodejs -u 1001
+# Create a non-root user and add it to a new group, and also to the docker group GID.
+ARG DOCKER_GID=999
+RUN addgroup -S nodejs && \
+    adduser -S nodejs -G nodejs && \
+    if ! getent group ${DOCKER_GID}; then \
+        addgroup -g ${DOCKER_GID} -S docker; \
+    fi && \
+    addgroup nodejs $(getent group ${DOCKER_GID} | cut -d: -f1)
 
 # Set ownership
 RUN chown -R nodejs:nodejs /app

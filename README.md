@@ -47,6 +47,24 @@ npm run dev
 
 The server will run on port 3000 by default (configurable via `PORT` environment variable).
 
+## Running with Docker
+
+To run the service using Docker, first ensure you have Docker and Docker Compose installed.
+
+The service is configured to run as a non-root user inside the container. To grant this user the necessary permissions to interact with the Docker socket, you must run the `docker compose` command with an environment variable that provides the GID of your host machine's `docker` group.
+
+Execute the following command from the root of the project directory:
+
+```bash
+DOCKER_GID=$(getent group docker | cut -d: -f3) docker compose up --build
+```
+
+This command does the following:
+- `DOCKER_GID=$(getent group docker | cut -d: -f3)`: This part dynamically gets the Group ID (GID) of the `docker` group on your host system and sets it as an environment variable for the command.
+- `docker compose up --build`: This builds the Docker image if it's not already built and starts the service.
+
+The server will be accessible on the port mapped in the `docker-compose.yml` file (e.g., `http://localhost:55392`).
+
 ## API Documentation
 
 All API endpoints require an `X-API-Key` header for authentication.

@@ -2,15 +2,19 @@ version: '3.8'
 
 services:
   java-executor:
-    build: .
+    build:
+      context: .
+      args:
+        DOCKER_GID: ${DOCKER_GID:-999}
     container_name: java-executor-service
+    user: nodejs
     ports:
       - "55392:3000"
     volumes:
       # Mount Docker socket to allow container management
       - /var/run/docker.sock:/var/run/docker.sock
-      # Persist SQLite database
-      - ./data:/app/data
+      # Persist SQLite database using a named volume
+      - executor-data:/app/data
     environment:
       - NODE_ENV=production
       - PORT=3000
@@ -24,6 +28,9 @@ services:
       timeout: 10s
       retries: 3
       start_period: 10s
+
+volumes:
+  executor-data:
 
 networks:
   executor-network:
