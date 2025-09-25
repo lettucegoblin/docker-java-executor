@@ -65,6 +65,27 @@ This command does the following:
 
 The server will be accessible on the port mapped in the `docker-compose.yml` file (e.g., `http://localhost:55392`).
 
+## Environment Variables
+
+The service uses the following environment variables:
+
+- `NODE_ENV`: Set to `production` for production environments. Defaults to `development`.
+- `PORT`: The port the server listens on inside the container. Defaults to `3000`.
+- `DATABASE_PATH`: The path to the SQLite database file. Defaults to `java_executor.db`.
+- `DOCKER_SOCKET_PATH`: The path to the Docker socket. Defaults to `/var/run/docker.sock` for Linux/WSL2. For Windows, use `//./pipe/docker_engine`.
+
+## Default API Key
+
+In non-production environments (`NODE_ENV !== 'production'`), a default API key (`test-api-key-123`) is created for testing purposes. This key is not created in production environments.
+
+## Healthcheck
+
+The service includes a healthcheck configuration in `docker-compose.yml` to verify the server's availability. The healthcheck sends a request to the `/health` endpoint every 30 seconds.
+
+## Port Mapping
+
+By default, the server listens on port `3000` inside the container. The `docker-compose.yml` file maps this to port `55392` on the host. Access the service at `http://localhost:55392`.
+
 ## API Documentation
 
 All API endpoints require an `X-API-Key` header for authentication.
