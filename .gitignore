@@ -54,3 +54,4 @@ build/
 tmp/
 temp/
 *.tmp
+php_client.php

@@ -3,6 +3,7 @@ const Docker = require('dockerode');
 const sqlite3 = require('sqlite3').verbose();
 const { v4: uuidv4 } = require('uuid');
 const tar = require('tar-stream');
+const { Writable } = require('stream');
 
 const app = express();
 app.use(express.json({ limit: '50mb' }));
@@ -224,18 +225,27 @@ async function executeJavaInDocker(jobId) {
       let stdout = '';
       let stderr = '';
       
-      stream.on('data', (chunk) => {
-        // Docker multiplexed stream format
-        const header = chunk.slice(0, 8);
-        const type = header[0];
-        const payload = chunk.slice(8);
-        
-        if (type === 1) {
-          stdout += payload.toString();
-        } else if (type === 2) {
-          stderr += payload.toString();
+      const stdoutStream = new Writable({
+        write(chunk, encoding, callback) {
+          stdout += chunk.toString();
+          callback();
         }
       });
+
+      const stderrStream = new Writable({
+        write(chunk, encoding, callback) {
+          stderr += chunk.toString();
+          callback();
+        }
+      });
+      
+      // Use the demuxStream utility to correctly parse the Docker stream
+      docker.modem.demuxStream(stream, stdoutStream, stderrStream);
+
+      stream.on('end', () => {
+        // This is called when the stream is finished
+      });
+
 
       // Monitor container stats
       const statsStream = await container.stats({ stream: true });
