@@ -57,7 +57,7 @@ async function createApiKey() {
       } else {
         console.log('\n✅ API Key created successfully!');
         console.log(`Key: ${key}`);
-        console.log('Please save this key securely. It cannot be retrieved later.');
+        console.log('To view this key later, use "List all API keys" option.');
       }
       showMenu();
     }

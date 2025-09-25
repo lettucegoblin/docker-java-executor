@@ -5,7 +5,7 @@ services:
     build: .
     container_name: java-executor-service
     ports:
-      - "3000:3000"
+      - "55392:3000"
     volumes:
       # Mount Docker socket to allow container management
       - /var/run/docker.sock:/var/run/docker.sock
@@ -27,4 +27,4 @@ services:
 
 networks:
   executor-network:
-    driver: bridge
+    driver: bridge # default driver by Docker, but explicitly stated for clarity

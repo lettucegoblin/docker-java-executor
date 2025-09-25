@@ -2,20 +2,16 @@ const express = require('express');
 const Docker = require('dockerode');
 const sqlite3 = require('sqlite3').verbose();
 const { v4: uuidv4 } = require('uuid');
-const fs = require('fs').promises;
-const path = require('path');
 const tar = require('tar-stream');
-const stream = require('stream');
-const { promisify } = require('util');
 
 const app = express();
 app.use(express.json({ limit: '50mb' }));
+
 
 const docker = new Docker();
 const PORT = process.env.PORT || 3000;
 const PROJECT_LABEL = 'java-executor-service';
 const CONTAINER_TIMEOUT_MS = 10000; // 10 seconds
-const WORK_DIR = path.join(__dirname, 'work');
 
 // Initialize SQLite database
 const db = new sqlite3.Database('java_executor.db');
@@ -118,6 +114,7 @@ async function cleanupOrphanedContainers() {
 }
 
 // Create a tar archive from Java code and input files
+// This is the most efficient way to copy multiple files into a Docker container dynamically
 async function createTarArchive(javaCode, inputFiles) {
   const pack = tar.pack();
   
@@ -146,13 +143,12 @@ async function createTarArchive(javaCode, inputFiles) {
 // Execute Java code in Docker container
 async function executeJavaInDocker(jobId) {
   return new Promise(async (resolve) => {
-    let container = null;
-    let timeout = null;
-    let statsInterval = null;
-    let maxCpuPercent = 0;
-    let maxMemoryMb = 0;
-    let timedOut = false;
-    const startTime = Date.now();
+  let container = null;
+  let timeout = null;
+  let maxCpuPercent = 0;
+  let maxMemoryMb = 0;
+  let timedOut = false;
+  const startTime = Date.now();
 
     try {
       // Get job details from database
@@ -237,9 +233,7 @@ async function executeJavaInDocker(jobId) {
 
       // Monitor container stats
       const statsStream = await container.stats({ stream: true });
-      statsInterval = setInterval(() => {
-        // Stats monitoring without blocking
-      }, 100);
+      // Stats monitoring interval removed (was unused)
 
       statsStream.on('data', (data) => {
         try {
@@ -282,7 +276,7 @@ async function executeJavaInDocker(jobId) {
       const executionTime = Date.now() - startTime;
       
       clearTimeout(timeout);
-      if (statsInterval) clearInterval(statsInterval);
+  // No statsInterval to clear
       statsStream.destroy();
 
       // Determine if crashed
@@ -352,7 +346,7 @@ async function executeJavaInDocker(jobId) {
       }
 
       if (timeout) clearTimeout(timeout);
-      if (statsInterval) clearInterval(statsInterval);
+  // No statsInterval to clear
 
       resolve({ success: false, error: error.message });
     }
@@ -475,9 +469,6 @@ app.get('/health', (req, res) => {
 // Start server
 async function start() {
   try {
-    // Ensure work directory exists
-    await fs.mkdir(WORK_DIR, { recursive: true });
-    
     // Initialize database
     await initDatabase();
     
