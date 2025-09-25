@@ -2,6 +2,34 @@
 
 A Node.js server that manages Docker containers for executing Java code securely with resource monitoring and persistent result storage.
 
+## Table of Contents
+
+- [Features](#features)
+- [Prerequisites](#prerequisites)
+- [Installation](#installation)
+- [Running the Server](#running-the-server)
+- [Running with Docker](#running-with-docker)
+- [API Documentation](#api-documentation)
+  - [Submit a Job](#submit-a-job)
+  - [Get Job Status/Results](#get-job-statusresults)
+  - [List Jobs](#list-jobs)
+  - [Health Check](#health-check)
+- [Usage Examples](#usage-examples)
+  - [Simple Hello World](#simple-hello-world)
+  - [With Arguments](#with-arguments)
+  - [With Input Files](#with-input-files)
+  - [Poll for Results](#poll-for-results)
+- [Database Schema](#database-schema)
+  - [api_keys Table](#api_keys-table)
+  - [jobs Table](#jobs-table)
+- [Security Considerations](#security-considerations)
+- [Production Deployment](#production-deployment)
+- [Troubleshooting](#troubleshooting)
+  - [Container Cleanup](#container-cleanup)
+  - [Database Reset](#database-reset)
+  - [Docker Permission Issues](#docker-permission-issues)
+- [License](#license)
+
 ## Features
 
 - **Secure Java Execution**: Runs Java code in isolated Docker containers
