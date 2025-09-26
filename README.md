@@ -372,10 +372,7 @@ This section contains diagrams illustrating the system design and API workflows.
 ### Sequence Diagram: Job Submission
 
 ```mermaid
----
-config:
-  theme: base
----
+
 sequenceDiagram
     participant Client as Client(PHP)
     participant API as API Server(Hydra)
